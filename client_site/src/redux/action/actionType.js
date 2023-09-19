@@ -1,0 +1,16 @@
+export const INCREMENT = "INCREMENT"
+export const DECREMENT = "DECREMENT"
+export const RESET = "RESET"
+export const INCREMENTBYVALUE = "INCREMENTBYVALUE"
+
+export const GET_TODO = "GET_TODO"
+export const ADD_TODO = "ADD_TODO"
+export const UPDATE_TODO = "UPDATE_TODO"
+export const REMOVE_TODO = "REMOVE_TODO"
+
+export const GET_PRODUCT = "GET_PRODUCT"
+export const ADD_TO_CART = "ADD_TO_CART"
+export const UPDATE_CART = "UPDATE_CART"
+export const REMOVE_CART = "REMOVE_CART"
+export const INCREMENT_CART_ITEM = "INCREMENT_CART_ITEM"
+export const DECREMENT_CART_ITEM = "DECREMENT_CART_ITEM"
