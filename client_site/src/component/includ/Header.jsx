@@ -1,12 +1,17 @@
-import React from 'react'
+import React from "react";
 
-const Header = () => {
-  return (
-    <header className="header">
-    <h1>Your App Name</h1>
-    {/* Add navigation links, user profile, etc. */}
-  </header>
-  )
-}
+const Header = ({ header }) => {
+    return (
+        <div className="content-header">
+            <div className="container-fluid">
+                <div className="row mb-2">
+                    <div className="col-sm-6">
+                        {header && <h1 className="m-0">{header}</h1>}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
 
-export default Header
+export default Header;

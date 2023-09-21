@@ -1,19 +1,18 @@
 import React from 'react'
 import AuthLayout from '../layout/AuthLayout'
 
-const NewPage = () => {
+const Dashboard = () => {
   return (
     <AuthLayout
     header={
       <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-          New Page
+          Dashboard
       </h2>
   }
     >
-    <div>NewPage</div>
-
-    </AuthLayout>
+    <div>Dashboard  Page</div>
+  </AuthLayout>
   )
 }
 
-export default NewPage
+export default Dashboard

@@ -119,11 +119,13 @@ services:
         restart: always
         volumes: # mount volumes here
             - ./client_site:/client_site
-            - /client_site/node_modules
         ports:
             - 3000:3000
         networks:
             - sail
+
+
+
 networks:
     sail:
         driver: bridge
@@ -136,5 +138,5 @@ volumes:
         driver: local
     phpmyadmin:
         driver: bridge
-    frontend:
+    client_site:
         driver: bridge
