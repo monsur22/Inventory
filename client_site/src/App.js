@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './component/pages/Home';
 import Dashboard from './component/pages/Dashboard';
 import Category from './component/pages/Category';
+import Supplier from './component/pages/Supplier';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
       {/* Add a route for the new page */}
       <Route path="/newpage" element={<NewPage />} />
       <Route path="/category" element={<Category />} />
+      <Route path="/supplier" element={<Supplier />} />
     </Routes>
   </Router>
   );

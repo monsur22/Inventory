@@ -29,7 +29,8 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $category = Category::create($request->all());
+        return response()->json(['message' => 'Category created successfully', 'category' => $category], 201);
     }
 
     /**
@@ -45,7 +46,7 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        //
+        return response()->json(['category' => $category], 200);
     }
 
     /**
@@ -53,7 +54,9 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        //
+        $category->update($request->all());
+        return response()->json(['message' => 'Category updated successfully', 'category' => $category], 200);
+
     }
 
     /**
@@ -61,6 +64,7 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
+        $category->delete();
+        return response()->json(['message' => 'Delete successfully', 'category' => $category], 201);
     }
 }

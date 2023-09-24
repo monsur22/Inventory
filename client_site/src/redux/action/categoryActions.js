@@ -13,10 +13,22 @@ export const getCategory = () =>{
             });
     };
 };
-export const addCategory = (category) => ({
-    type: actions.ADD_CATEGORY,
-    payload:  category ,
-});
+export const addCategory = (category) => {
+    // type: actions.ADD_CATEGORY,
+    // payload:  category ,
+    return (dispatch) => {
+        axios
+            .post('http://localhost/api/category',category)
+            .then((response) => {
+                const categories = response.data;
+                dispatch({type: actions.ADD_CATEGORY, payload: categories});
+            })
+            .catch((error) => {
+                console.error('Error fetching product data:', error);
+            });
+    };
+
+};
 export const updateCategory = (updatedCategory) => ({
     type: actions.UPDATE_CATEGORY,
     payload: updatedCategory,

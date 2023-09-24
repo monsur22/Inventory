@@ -6,44 +6,104 @@ import { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
-import { getCategory } from '../../redux/action/categoryActions';
-import {useDispatch, useSelector} from "react-redux";
+import axios from 'axios'
 
 const Category = () => {
     const [show, setShow] = useState(false);
-    const [editData, setEditData] = useState({
-        isEditing: false,
-        editItemId: null, // Store the ID of the category being edited
+    const [categories, setCategories] = useState([]); // Use categories, not data
+    const [formData, setFormData] = useState({
+        title: '',
+      });
+    const [editMode, setEditMode] = useState(false); // Add editMode state
+    const [editedCategoryId, setEditedCategoryId] = useState(null);
 
-    });
-    const handleClose = () => setShow(false);
+    const handleClose = () => {
+        setShow(false)
+        setEditMode(false);
+    };
     const handleShow = () => setShow(true);
 
-    const dispatch = useDispatch();
-    const categories = useSelector((state) => state.category.category);
 
     useEffect(() => {
-        dispatch(getCategory());
-    }, [dispatch]);
-    console.log(categories)
+        getCategory();
+    }, []);
 
+    function getCategory() {
+        axios
+          .get('http://localhost/api/category')
+          .then((response) => {
+            const categoriesData = response.data;
+            setCategories(categoriesData); // Update state with fetched data
+          })
+          .catch((error) => {
+            console.error('Error fetching product data:', error);
+          });
+      }
     function handleSubmit(e) {
         e.preventDefault();
+        axios.post('http://localhost/api/category',formData)
+            .then((response) => {
+                const createdCategory = response.data.category;
+                setCategories([...categories, createdCategory])
+                setFormData({ title: ''});
+                handleClose();
+            })
+            .catch((error) => {
+                console.error('Error fetching product data:', error);
+            });
+
         console.log("click submit")
     }
 
-        // const handleEdit = (id) => {
-    //     setEditData({
-    //         isEditing: true,
-    //         editItemId: id,
-    //     });
-    //     handleShow(); // Show the modal
-    // };
+    function handleEdit(id) {
+        // You may want to fetch the category data to pre-fill the form with existing values
+        axios.get(`http://localhost/api/category/${id}/edit`)
+            .then((response) => {
+                const categoryData = response.data.category;
+                setFormData({
+                    title: categoryData.title,
+                    desc: categoryData.desc,
+                });
+                setEditMode(true);
+                setEditedCategoryId(id);
+                handleShow();
+            })
+            .catch((error) => {
+                console.error('Error fetching category data:', error);
+            });
+    }
+    function handleUpdate(e, id) {
+        e.preventDefault(); // Prevent the form from submitting as it's handled manually via axios
+        console.log(editedCategoryId)
+
+        axios
+          .put(`http://localhost/api/category/${editedCategoryId}`, formData)
+          .then((response) => {
+            const updatedCategory = response.data.category;
+            const updatedCategories = categories.map((category) =>
+              category.id === id ? updatedCategory : category
+            );
+            setCategories(updatedCategories);
+            setFormData({ title: '' });
+            setEditMode(false);
+            handleClose();
+          })
+          .catch((error) => {
+            console.error('Error updating category:', error);
+          });
+      }
 
     function handleDelete(id) {
-
+        axios.delete(`http://localhost/api/category/${id}`)
+            .then((response) => {
+                const updatedCategories = categories.filter((category) => category.id !== id);
+                setCategories(updatedCategories);
+            })
+            .catch((error) => {
+                console.error('Error fetching product data:', error);
+            });
     }
-
+console.log(categories)
 
   return (
     <AuthLayout
@@ -63,13 +123,15 @@ const Category = () => {
             backdrop="static"
             keyboard={false}
         >
-            <Modal.Header closeButton>
+            <Modal.Header>
                 <Modal.Title className="card-primary">
-                {editData.isEditing ? 'Edit Category' : 'Add Category'}
+                {editMode ? 'Edit Category' : 'Add Category'}
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form onSubmit={handleSubmit}>
+                {/* <Form onSubmit={editMode ? handleUpdate : handleSubmit}> */}
+                <Form onSubmit={(e) => editMode ? handleUpdate(e, editedCategoryId) : handleSubmit(e)}>
+
                     <Form.Group
                         className="mb-3"
                         controlId="exampleForm.ControlInput1"
@@ -78,10 +140,10 @@ const Category = () => {
                         <Form.Control
                             type="text"
                             placeholder="Category Title"
-                            // value={editData.isEditing ? category_edit.title : data.title}
-                            // onChange={(e) =>
-                            //     setData("title", e.target.value)
-                            // }
+                            value={formData.title}
+                            onChange={(e) =>
+                                setFormData({ ...formData, title: e.target.value })
+                            }
                             autoFocus
                         />
 
@@ -94,7 +156,7 @@ const Category = () => {
                             Close
                         </Button>
                         <Button variant="primary" type="submit">
-                        {editData.isEditing ? 'Update' : 'Create'}
+                            {editMode ? 'Update' : 'Create'}
                         </Button>
                     </Modal.Footer>
                 </Form>
@@ -143,12 +205,12 @@ const Category = () => {
                                                     />
                                                 </a>
 
-                                                <a href='' className="btn btn-info">
+                                                <a  className="btn btn-info">
                                                     <FontAwesomeIcon
                                                         icon={
                                                             faEdit
                                                         }
-                                                        // onClick={() => handleEdit(item.id)}
+                                                        onClick={() => handleEdit(item.id)}
                                                     />
                                                 </a>
                                                 <a className="btn btn-danger">
@@ -156,11 +218,11 @@ const Category = () => {
                                                         icon={
                                                             faTrash
                                                         }
-                                                        // onClick={() =>
-                                                        //     handleDelete(
-                                                        //         item.id
-                                                        //     )
-                                                        // }
+                                                        onClick={() =>
+                                                            handleDelete(
+                                                                item.id
+                                                            )
+                                                        }
                                                     />
                                                 </a>
                                             </div>

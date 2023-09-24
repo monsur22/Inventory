@@ -79,7 +79,7 @@ const Sidebar = () => {
                             </a>
                         </li>
                         <li className="nav-item">
-                            <a href="#" className="nav-link">
+                            <a href="" className="nav-link">
                                 <FontAwesomeIcon
                                     icon={faCopy}
                                     className="nav-icon"
@@ -88,12 +88,13 @@ const Sidebar = () => {
                             </a>
                         </li>
                         <li className="nav-item">
-                            <a href="#" className="nav-link">
+                            <a href="" className="nav-link">
                                 <FontAwesomeIcon
                                     icon={faCopy}
                                     className="nav-icon"
                                 />
-                                <p>Supplier</p>
+                            <Link to="/supplier" relative="path"> Supplier</Link>
+
                             </a>
                         </li>
                         <li className="nav-item">
