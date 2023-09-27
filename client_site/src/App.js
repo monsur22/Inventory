@@ -7,6 +7,7 @@ import Home from './component/pages/Home';
 import Dashboard from './component/pages/Dashboard';
 import Category from './component/pages/Category';
 import Supplier from './component/pages/Supplier';
+import Product from './component/pages/Product';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
       <Route path="/newpage" element={<NewPage />} />
       <Route path="/category" element={<Category />} />
       <Route path="/supplier" element={<Supplier />} />
+      <Route path="/product" element={<Product />} />
     </Routes>
   </Router>
   );

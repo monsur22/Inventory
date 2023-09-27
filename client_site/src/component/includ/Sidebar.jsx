@@ -103,7 +103,8 @@ const Sidebar = () => {
                                     icon={faCopy}
                                     className="nav-icon"
                                 />
-                                <p>Product</p>
+                            <Link to="/product" relative="path"> Product</Link>
+
                             </a>
                         </li>
                     </ul>
