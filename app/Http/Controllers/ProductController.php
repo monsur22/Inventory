@@ -69,7 +69,7 @@ class ProductController extends Controller
         // Save the product to the database
         // dd($request->all());
         $product->save();
-
+        $product->load(['category', 'supplier']);
         return response()->json([
             'message' => 'Product created successfully',
             'product' => $product,
@@ -81,7 +81,8 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        //
+        $product = Product::with(['category', 'supplier'])->find($product->id);
+        return response()->json(['product' => $product], 200);
     }
 
     /**
@@ -103,23 +104,37 @@ class ProductController extends Controller
         // Handle the image update
         $imagePath = $product->image_path; // Get the current image path
 
+        // if ($request->hasFile('image')) {
+        //     $uploadedFile = $request->file('image');
+        //     if ($uploadedFile->isValid()) {
+        //         // Unlink (delete) the old image
+        //         if ($imagePath) {
+        //             $oldImagePath = public_path($imagePath);
+        //             if (file_exists($oldImagePath)) {
+        //                 unlink($oldImagePath);
+        //             }
+        //         }
+        //         // Store the new image
+        //         $imagePath = $uploadedFile->store('images', 'public');
+        //     } else {
+        //         return response()->json(['error' => 'Invalid file.']);
+        //     }
+        // }
         if ($request->hasFile('image')) {
             $uploadedFile = $request->file('image');
             if ($uploadedFile->isValid()) {
                 // Unlink (delete) the old image
-                if ($imagePath) {
-                    $oldImagePath = public_path($imagePath);
-                    if (file_exists($oldImagePath)) {
-                        unlink($oldImagePath);
-                    }
+                $oldImagePath = public_path($product->image_path);
+                if ($product->image_path && file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
                 }
                 // Store the new image
                 $imagePath = $uploadedFile->store('images', 'public');
+                $product->image_path = 'storage/' . $imagePath;
             } else {
                 return response()->json(['error' => 'Invalid file.']);
             }
         }
-
         // Update the product with the provided data
         $product->title = $request->input('title');
         $product->description = $request->input('description', 'This is a sample product.');
@@ -127,9 +142,10 @@ class ProductController extends Controller
         $product->quantity = $request->input('quantity');
         $product->category_id = $request->input('category_id');
         $product->supplier_id = $request->input('supplier_id');
-        $product->image_path = 'storage/' . $imagePath;
+        // $product->image_path = 'storage/' . $imagePath;
         // dd($request->all());
         $product->save();
+        $product->load(['category', 'supplier']);
 
         return response()->json([
             'message' => 'Product updated successfully',

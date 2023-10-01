@@ -1,12 +1,14 @@
 import React from 'react'
 import AuthLayout from '../layout/AuthLayout'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faEye, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faEye, faTrash, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import axios from 'axios'
+import SupplierShow from './SupplierShow';
+import Pagination from './Pagination';
 
 const Supplier = () => {
     const [show, setShow] = useState(false);
@@ -17,8 +19,20 @@ const Supplier = () => {
       });
     const [editMode, setEditMode] = useState(false); // Add editMode state
     const [editedSupplierId, setEditedSupplierId] = useState(null);
+    const [isSupplierModalOpen, setIsSupplierModalOpen] = useState(false);
+    const [singleSupplier, setSingleSupplier] = useState('')
+    //pagination start
+    const itemsPerPage = 4; // Number of items to display per page
 
+    const [currentPage, setCurrentPage] = useState(0);
 
+    const handlePageChange = (selectedPage) => {
+      setCurrentPage(selectedPage.selected);
+    };
+
+    const offset = currentPage * itemsPerPage;
+    const currentItems = suppliers.slice(offset, offset + itemsPerPage);
+//Pagination end
     const handleClose = () => {
         setShow(false)
         setEditMode(false);
@@ -106,6 +120,23 @@ const Supplier = () => {
                 console.error('Error fetching product data:', error);
             });
     }
+    function handleSupplierShow(id){
+        console.log(id)
+        axios
+            .get(`http://localhost/api/supplier/${id}`)
+            .then((response) => {
+                const singleSupplier = response.data.supplier
+                console.log(singleSupplier)
+                setIsSupplierModalOpen(true)
+                setSingleSupplier(singleSupplier)
+            })
+            .catch((error) => {
+                console.error("Error updating products:", error);
+            });
+
+
+
+    }
 console.log(suppliers)
 
   return (
@@ -128,6 +159,9 @@ console.log(suppliers)
                       <Modal.Title className="card-primary">
                           {editMode ? "Edit Supplier" : "Add Supplier"}
                       </Modal.Title>
+                      <Button variant="link" onClick={handleClose}>
+                            <FontAwesomeIcon icon={faTimes} />
+                        </Button>
                   </Modal.Header>
                   <Modal.Body>
                       {/* <Form onSubmit={editMode ? handleUpdate : handleSubmit}> */}
@@ -211,18 +245,22 @@ console.log(suppliers)
                                       </tr>
                                   </thead>
                                   <tbody>
-                                      {suppliers.map((item) => (
+                                      {currentItems.map((item) => (
                                           <tr key={item.id}>
                                               <td>{item.id}</td>
                                               <td>{item.title}</td>
                                               <td>
                                                   <div className="btn-group btn-group-sm">
                                                       <a
-                                                          href=""
                                                           className="btn btn-success"
                                                       >
                                                           <FontAwesomeIcon
                                                               icon={faEye}
+                                                              onClick={() =>
+                                                                handleSupplierShow(
+                                                                    item.id
+                                                                )
+                                                            }
                                                           />
                                                       </a>
 
@@ -254,9 +292,20 @@ console.log(suppliers)
                               </table>
                           </div>
                           {/* pagination will be here */}
+                          <Pagination
+                                pageCount={Math.ceil(suppliers.length / itemsPerPage)}
+                                handlePageChange={handlePageChange}
+                            />
                       </div>
                   </div>
               </div>
+              {isSupplierModalOpen && (
+                    <SupplierShow
+                    isOpen ={isSupplierModalOpen}
+                    isClose={setIsSupplierModalOpen}
+                    singleSupplier = {singleSupplier}
+                    />
+                )}
           </div>
       </AuthLayout>
   );

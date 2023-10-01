@@ -1,12 +1,13 @@
 import React from 'react'
 import AuthLayout from '../layout/AuthLayout'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faEye, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faEye, faTrash, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import axios from 'axios'
+import Pagination from './Pagination';
 
 const Category = () => {
     const [show, setShow] = useState(false);
@@ -17,6 +18,18 @@ const Category = () => {
     const [editMode, setEditMode] = useState(false); // Add editMode state
     const [editedCategoryId, setEditedCategoryId] = useState(null);
 
+    //pagination start
+    const itemsPerPage = 4; // Number of items to display per page
+
+    const [currentPage, setCurrentPage] = useState(0);
+
+    const handlePageChange = (selectedPage) => {
+      setCurrentPage(selectedPage.selected);
+    };
+
+    const offset = currentPage * itemsPerPage;
+    const currentItems = categories.slice(offset, offset + itemsPerPage);
+//Pagination end
     const handleClose = () => {
         setShow(false)
         setEditMode(false);
@@ -127,6 +140,9 @@ console.log(categories)
                 <Modal.Title className="card-primary">
                 {editMode ? 'Edit Category' : 'Add Category'}
                 </Modal.Title>
+                <Button variant="link" onClick={handleClose}>
+                    <FontAwesomeIcon icon={faTimes} />
+                </Button>
             </Modal.Header>
             <Modal.Body>
                 {/* <Form onSubmit={editMode ? handleUpdate : handleSubmit}> */}
@@ -190,7 +206,7 @@ console.log(categories)
                                 </tr>
                             </thead>
                             <tbody>
-                                {categories.map((item)=>(
+                                {currentItems.map((item)=>(
                                     <tr key={item.id}>
                                         <td>{item.id}</td>
                                         <td>{item.title}</td>
@@ -235,6 +251,10 @@ console.log(categories)
                         </table>
                     </div>
                     {/* pagination will be here */}
+                    <Pagination
+                        pageCount={Math.ceil(categories.length / itemsPerPage)}
+                        handlePageChange={handlePageChange}
+                    />
                 </div>
             </div>
         </div>

@@ -1,24 +1,46 @@
-import React from "react";
+import React from 'react';
 import AuthLayout from "../layout/AuthLayout";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faEye, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faEye, faTrash, faTimes } from "@fortawesome/free-solid-svg-icons";
+
 import { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import axios from "axios";
+import ProductShow from "./ProductShow";
+import Pagination from './Pagination';
+import ReactPaginate from 'react-paginate';
+
 
 const Product = () => {
     const [show, setShow] = useState(false);
     const [categories, setCategories] = useState([]); // Use categories, not data
     const [suppliers, setSuppliers] = useState([]); // Use suppliers, not data
     const [products, setProducts] = useState([]); // Use suppliers, not data
+    const [singleProduct, setSingleProduct] = useState('')
+
+    const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+    const [productModalShow, setProductModalShow] = useState(false);
+
 
     const [formData, setFormData] = useState({
         title: "",category_id :"",supplier_id :"",price:"",quantity:"",description:"",image:""
     });
     const [editMode, setEditMode] = useState(false); // Add editMode state
     const [editedProductId, setEditedProductId] = useState(null);
+//pagination start
+    const itemsPerPage = 4; // Number of items to display per page
+
+    const [currentPage, setCurrentPage] = useState(0);
+
+    const handlePageChange = (selectedPage) => {
+      setCurrentPage(selectedPage.selected);
+    };
+
+    const offset = currentPage * itemsPerPage;
+    const currentItems = products.slice(offset, offset + itemsPerPage);
+//Pagination end
 
     const handleClose = () => {
         setShow(false);
@@ -84,9 +106,11 @@ const Product = () => {
                 },
             })
             .then((response) => {
-                console.log(response)
+                console.log("response after create:",response)
                 const createdProduct = response.data.product;
-                setProducts([...products, createdProduct]);
+                // setProducts([...products, createdProduct]);
+                setProducts((products) => [...products, createdProduct]);
+
                 resetForm();
                 handleClose();
             })
@@ -158,6 +182,23 @@ const Product = () => {
                 console.error("Error fetching product data:", error);
             });
     }
+    function handleProductShow(id){
+        console.log(id)
+        axios
+            .get(`http://localhost/api/product/${id}`)
+            .then((response) => {
+                const singleProduct = response.data.product
+                console.log(singleProduct)
+                setIsProductModalOpen(true)
+                setSingleProduct(singleProduct)
+            })
+            .catch((error) => {
+                console.error("Error updating products:", error);
+            });
+
+        console.log(isProductModalOpen)
+
+    }
     console.log(products);
 
     return (
@@ -181,6 +222,9 @@ const Product = () => {
                         <Modal.Title className="card-primary">
                             {editMode ? "Edit Product" : "Add Product"}
                         </Modal.Title>
+                        <Button variant="link" onClick={handleClose}>
+                            <FontAwesomeIcon icon={faTimes} />
+                        </Button>
                     </Modal.Header>
                     <Modal.Body>
                         {/* <Form onSubmit={editMode ? handleUpdate : handleSubmit}> */}
@@ -367,6 +411,7 @@ const Product = () => {
                                         <tr>
                                             <th style={{ width: 10 }}>#</th>
                                             <th>Tittle</th>
+                                            <th>Supplier</th>
                                             <th>Price</th>
                                             <th>Quantity</th>
                                             <th>Image</th>
@@ -376,23 +421,28 @@ const Product = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {products.map((item) => (
+                                        {currentItems.map((item) => (
                                             <tr key={item.id}>
                                                 <td>{item.id}</td>
                                                 <td>{item.title}</td>
+                                                <td>{item.supplier.title}</td>
                                                 <td>{item.price}</td>
                                                 <td>{item.quantity}</td>
                                                 <td>
-                                                    <img height={'100px'} src={`http://localhost/${item.image_path}`} alt="Product" />
+                                                    <img height={'50px'} src={`http://localhost/${item.image_path}`} alt="Product" />
                                                 </td>
                                                 <td>
                                                     <div className="btn-group btn-group-sm">
                                                         <a
-                                                            href=""
                                                             className="btn btn-success"
                                                         >
                                                             <FontAwesomeIcon
                                                                 icon={faEye}
+                                                                onClick={() =>
+                                                                    handleProductShow(
+                                                                        item.id
+                                                                    )
+                                                                }
                                                             />
                                                         </a>
 
@@ -424,9 +474,20 @@ const Product = () => {
                                 </table>
                             </div>
                             {/* pagination will be here */}
+                            <Pagination
+                                pageCount={Math.ceil(products.length / itemsPerPage)}
+                                handlePageChange={handlePageChange}
+                                />
                         </div>
                     </div>
                 </div>
+                {isProductModalOpen && (
+                    <ProductShow
+                    isOpen ={isProductModalOpen}
+                    isClose={setIsProductModalOpen}
+                    singleProduct = {singleProduct}
+                    />
+                )}
             </div>
         </AuthLayout>
     );
