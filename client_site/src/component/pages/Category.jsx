@@ -8,6 +8,7 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import axios from 'axios'
 import Pagination from './Pagination';
+import Swal from 'sweetalert2';
 
 const Category = () => {
     const [show, setShow] = useState(false);
@@ -29,7 +30,7 @@ const Category = () => {
 
     const offset = currentPage * itemsPerPage;
     const currentItems = categories.slice(offset, offset + itemsPerPage);
-//Pagination end
+    //Pagination end
     const handleClose = () => {
         setShow(false)
         setEditMode(false);
@@ -60,6 +61,12 @@ const Category = () => {
                 setCategories([...categories, createdCategory])
                 setFormData({ title: ''});
                 handleClose();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Category has been saved',
+                    showConfirmButton: false,
+                    timer: 1500
+                  })
             })
             .catch((error) => {
                 console.error('Error fetching product data:', error);
@@ -69,7 +76,6 @@ const Category = () => {
     }
 
     function handleEdit(id) {
-        // You may want to fetch the category data to pre-fill the form with existing values
         axios.get(`http://localhost/api/category/${id}/edit`)
             .then((response) => {
                 const categoryData = response.data.category;
@@ -100,6 +106,12 @@ const Category = () => {
             setFormData({ title: '' });
             setEditMode(false);
             handleClose();
+            Swal.fire({
+                icon: 'success',
+                title: 'Update has been saved',
+                showConfirmButton: false,
+                timer: 1500
+              })
           })
           .catch((error) => {
             console.error('Error updating category:', error);
@@ -107,14 +119,26 @@ const Category = () => {
       }
 
     function handleDelete(id) {
-        axios.delete(`http://localhost/api/category/${id}`)
-            .then((response) => {
-                const updatedCategories = categories.filter((category) => category.id !== id);
-                setCategories(updatedCategories);
-            })
-            .catch((error) => {
-                console.error('Error fetching product data:', error);
-            });
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You will not be able to recover this category!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.delete(`http://localhost/api/category/${id}`)
+                    .then((response) => {
+                        const updatedCategories = categories.filter((category) => category.id !== id);
+                        setCategories(updatedCategories);
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching product data:', error);
+                    });
+                }
+        });
     }
 console.log(categories)
 
@@ -145,7 +169,6 @@ console.log(categories)
                 </Button>
             </Modal.Header>
             <Modal.Body>
-                {/* <Form onSubmit={editMode ? handleUpdate : handleSubmit}> */}
                 <Form onSubmit={(e) => editMode ? handleUpdate(e, editedCategoryId) : handleSubmit(e)}>
 
                     <Form.Group

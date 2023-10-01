@@ -10,7 +10,7 @@ import Form from "react-bootstrap/Form";
 import axios from "axios";
 import ProductShow from "./ProductShow";
 import Pagination from './Pagination';
-import ReactPaginate from 'react-paginate';
+import Swal from 'sweetalert2';
 
 
 const Product = () => {
@@ -113,6 +113,12 @@ const Product = () => {
 
                 resetForm();
                 handleClose();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Product has been saved',
+                    showConfirmButton: false,
+                    timer: 1500
+                  })
             })
             .catch((error) => {
                 console.error("Error fetching product data:", error);
@@ -163,6 +169,12 @@ const Product = () => {
                 resetForm();
                 setEditMode(false);
                 handleClose();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Update has been saved',
+                    showConfirmButton: false,
+                    timer: 1500
+                  })
             })
             .catch((error) => {
                 console.error("Error updating products:", error);
@@ -227,7 +239,6 @@ const Product = () => {
                         </Button>
                     </Modal.Header>
                     <Modal.Body>
-                        {/* <Form onSubmit={editMode ? handleUpdate : handleSubmit}> */}
                         <Form
                             onSubmit={(e) =>
                                 editMode

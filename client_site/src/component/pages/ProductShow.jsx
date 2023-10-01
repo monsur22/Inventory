@@ -44,7 +44,6 @@ const ProductShow = (props) => {
                                 <p>Category: {props.singleProduct.category.title}</p>
                                 <p>Supplier: {props.singleProduct.supplier.title}</p>
                                 <p>Description: {props.singleProduct.description}</p>
-                                {/* <Button variant="primary">Add to Cart</Button> */}
                             </Col>
                         </Row>
                     </Container>

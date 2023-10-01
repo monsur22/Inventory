@@ -9,6 +9,7 @@ import Form from 'react-bootstrap/Form';
 import axios from 'axios'
 import SupplierShow from './SupplierShow';
 import Pagination from './Pagination';
+import Swal from 'sweetalert2';
 
 const Supplier = () => {
     const [show, setShow] = useState(false);
@@ -32,7 +33,7 @@ const Supplier = () => {
 
     const offset = currentPage * itemsPerPage;
     const currentItems = suppliers.slice(offset, offset + itemsPerPage);
-//Pagination end
+    //Pagination end
     const handleClose = () => {
         setShow(false)
         setEditMode(false);
@@ -64,6 +65,12 @@ const Supplier = () => {
                 setSuppliers([...suppliers, createdSuppliers])
                 setFormData({ title: '', desc:''});
                 handleClose();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Supplier has been saved',
+                    showConfirmButton: false,
+                    timer: 1500
+                  })
             })
             .catch((error) => {
                 console.error('Error fetching product data:', error);
@@ -73,7 +80,6 @@ const Supplier = () => {
     }
 
     function handleEdit(id) {
-        // You may want to fetch the supplier data to pre-fill the form with existing values
         axios.get(`http://localhost/api/supplier/${id}/edit`)
             .then((response) => {
                 const supplierData = response.data.supplier;
@@ -104,6 +110,12 @@ const Supplier = () => {
             setFormData({ title: '' ,desc:''});
             setEditMode(false);
             handleClose();
+            Swal.fire({
+                icon: 'success',
+                title: 'Update has been saved',
+                showConfirmButton: false,
+                timer: 1500
+              })
           })
           .catch((error) => {
             console.error('Error updating supplier:', error);
@@ -164,7 +176,6 @@ console.log(suppliers)
                         </Button>
                   </Modal.Header>
                   <Modal.Body>
-                      {/* <Form onSubmit={editMode ? handleUpdate : handleSubmit}> */}
                       <Form
                           onSubmit={(e) =>
                               editMode
