@@ -57,7 +57,7 @@ class AuthServiceImpl implements AuthServiceInterface
     {
         try {
             Mail::to($exist_user->email)->send(new RegistrationMail($exist_user, $confirm_code));
-            return response()->json(['message' => 'Check your email']);
+            return response()->json(['message' => 'Check your email','status'=>true], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error sending email. Please try again later.'], 500);
         }

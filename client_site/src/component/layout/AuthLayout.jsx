@@ -4,6 +4,7 @@ import Sidebar from '../includ/Sidebar'
 import '../../assets/admin/css/adminlte.css'
 import Navbar from '../includ/Navbar';
 import Footer from '../includ/Footer';
+
 const AuthLayout = ({header,children}) => {
   return (
     <div className="hold-transition sidebar-mini layout-fixed">
