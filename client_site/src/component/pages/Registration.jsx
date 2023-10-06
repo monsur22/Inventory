@@ -18,7 +18,7 @@ const Registration = () => {
           const response = await axios.post('http://localhost/api/auth/register', formData);
           console.log(response);
 
-          if (response.data.status == true) {
+          if (response.data.success) {
             setFormData({ email: '' });
             Swal.fire(
               'Account created successfully',

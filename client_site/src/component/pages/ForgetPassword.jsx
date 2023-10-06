@@ -1,49 +1,39 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
 import { faFacebook, faGooglePlus } from "@fortawesome/free-brands-svg-icons";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios'
 import GuestLayout from "../layout/GuestLayout";
-import Swal from 'sweetalert2';
-
-const Login = () => {
+import Swal from 'sweetalert2'
+const ForgetPassword = () => {
     const [formData, setFormData] = useState({
-        email: '',
-        password: '',
+        email: ''
       });
     const navigate = useNavigate();
-    const location = useLocation();
-    const query = new URLSearchParams(location.search);
-    const passwordResetSuccess = query.get('passwordResetSuccess') === 'true';
 
-    useEffect(() => {
-      if (passwordResetSuccess) {
-        Swal.fire({
-          icon: 'success',
-          title: 'Password Reset',
-          text: 'Password reset successful!',
-          timer: 3000, // Adjust the duration as needed
-          showConfirmButton: false,
-        });
-      }
-    }, [passwordResetSuccess]);
-
-    async function handleSignIn(e) {
+    async function handleSignUp(e) {
         e.preventDefault();
         try {
-          const response = await axios.post('http://localhost/api/auth/login', formData);
-          console.log(response)
+          const response = await axios.post('http://localhost/api/auth/reset-password', formData);
+          console.log(response);
+
           if (response.data.success) {
-            localStorage.setItem('token', response.data.token);
-            window.location.href = '/';
+            setFormData({ email: '' });
+            Swal.fire(
+              'Reset password',
+              'Reset password link send your email ',
+              'success'
+            );
           } else {
-            console.error('Login failed. No success in response.');
+            setFormData({ email: '' });
+            Swal.fire('Registration Failed', 'Please try again later.', 'error');
           }
         } catch (error) {
-          console.error('Error during login:', error);
+          console.error('Error during registration:', error);
         }
       }
+
     return (
         <>
             <GuestLayout>
@@ -56,9 +46,9 @@ const Login = () => {
                         </div>
                         <div className="card-body">
                             <p className="login-box-msg">
-                                Sign in to start your session
+                                Reset Password
                             </p>
-                            <form onSubmit={(e) =>  handleSignIn(e)}>
+                            <form onSubmit={(e) =>  handleSignUp(e)}>
                                 <div className="input-group mb-3">
                                     <input
                                         type="email"
@@ -67,7 +57,7 @@ const Login = () => {
                                         id="email"
                                         name="email"
                                         value={formData.email}
-                                        autoComplete="username"
+                                        autoComplete="eamil"
                                         onChange={(e) =>
                                             setFormData({
                                                 ...formData,
@@ -86,36 +76,6 @@ const Login = () => {
                                 </div>
                                 {/* <InputError
                                 message={errors.email}
-                                className="mt-2"
-                            /> */}
-
-                                <div className="input-group mb-3">
-                                    <input
-                                        type="password"
-                                        className="form-control"
-                                        placeholder="Password"
-                                        id="password"
-                                        name="password"
-                                        value={formData.password}
-                                        autoComplete="current-password"
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                password: e.target.value})
-                                        }
-                                    />
-
-                                    <div className="input-group-append">
-                                        <div className="input-group-text">
-                                            <FontAwesomeIcon
-                                                icon={faLock}
-                                                className="icon-class"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                                {/* <InputError
-                                message={errors.password}
                                 className="mt-2"
                             /> */}
 
@@ -139,40 +99,25 @@ const Login = () => {
                                     </div>
                                 </div> */}
 
-                                    <div className="col-4">
+                                    <div className="col-6">
                                         <button
                                             type="submit"
                                             className="btn btn-primary btn-block"
 
                                         >
-                                            Sign In
+                                            Send Reset Link
                                         </button>
                                     </div>
                                 </div>
                             </form>
-                            <div className="social-auth-links text-center mt-2 mb-3">
-                                <a
-                                    href="#"
-                                    className="btn btn-block btn-primary"
-                                >
-                                    <FontAwesomeIcon icon={faFacebook} /> Sign
-                                    in using Facebook
-                                </a>
-                                <a
-                                    href="#"
-                                    className="btn btn-block btn-danger"
-                                >
-                                    <FontAwesomeIcon icon={faGooglePlus} /> Sign
-                                    in using Google+
-                                </a>
-                            </div>
 
-                            <p className="mb-1">
-                                <Link to="/forget-password">Forgot your password?</Link>
+
+                            {/* <p className="mb-1">
+                                <Link>Already have account?</Link>
                             </p>
                             <p className="mb-0">
-                                <Link to="/singup">Register a new membership</Link>
-                            </p>
+                                <Link to="/login">Log In</Link>
+                            </p> */}
                         </div>
                     </div>
                 </div>
@@ -181,4 +126,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default ForgetPassword;

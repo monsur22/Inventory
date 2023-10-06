@@ -6,22 +6,29 @@ import { faFacebook, faGooglePlus } from "@fortawesome/free-brands-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios'
 import GuestLayout from "../layout/GuestLayout";
-function EmailVerification() {
+import Swal from 'sweetalert2';
+function PasswrodReset() {
   const { token } = useParams();
   const [formData, setFormData] = useState({
     password: '',
     password_confirmation:''
   });
 
-  async function handleSignIn(e,token) {
+  async function handleUpdatedPassword(e,token) {
     e.preventDefault();
     try {
-      const response = await axios.post(`http://localhost/api/auth/email-verify/${token}`, formData);
+      const response = await axios.post(`http://localhost/api/auth/reset-password/${token}`, formData);
       console.log(response)
+      console.log(token)
       if (response.data.success) {
-        localStorage.setItem('token', response.data.token);
-        window.location.href = '/';
+        // localStorage.setItem('token', response.data.token);
+        window.location.href = '/login?passwordResetSuccess=true';
         // navigate('/')
+        Swal.fire(
+            'Reset Password',
+            'Password update successfully',
+            'success'
+          );
       } else {
         console.error('Login failed. No success in response.');
       }
@@ -43,7 +50,7 @@ function EmailVerification() {
                     <p className="login-box-msg">
                         Passwrod confirmation
                     </p>
-                    <form onSubmit={(e) =>  handleSignIn(e,token)}>
+                    <form onSubmit={(e) =>  handleUpdatedPassword(e,token)}>
                         <div className="input-group mb-3">
                             <input
                                 type="password"
@@ -122,4 +129,4 @@ function EmailVerification() {
   );
 }
 
-export default EmailVerification;
+export default PasswrodReset;

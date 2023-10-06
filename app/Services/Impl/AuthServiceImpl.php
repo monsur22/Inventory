@@ -42,6 +42,7 @@ class AuthServiceImpl implements AuthServiceInterface
         $user = $this->authRepository->createUser($userData);
         $this->sendConfirmationEmail($user, $confirm_code);
         return response()->json([
+            'success' => true,
             'message' => 'User registered successfully',
             'user' => $user,
             'token' => $user->createToken("API TOKEN")->plainTextToken,
@@ -57,7 +58,7 @@ class AuthServiceImpl implements AuthServiceInterface
     {
         try {
             Mail::to($exist_user->email)->send(new RegistrationMail($exist_user, $confirm_code));
-            return response()->json(['message' => 'Check your email','status'=>true], 200);
+            return response()->json(['message' => 'Check your email','success'=>true], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error sending email. Please try again later.'], 500);
         }
@@ -84,6 +85,7 @@ class AuthServiceImpl implements AuthServiceInterface
                 ], 500);
             }
             return response()->json([
+                "success" => true,
                 "msg" => "Email verified and password updated.",
                 'token' => $user->createToken("API TOKEN")->plainTextToken,
                 'token_type' => 'Bearer',
@@ -105,6 +107,7 @@ class AuthServiceImpl implements AuthServiceInterface
                 return response()->json(['error' => 'Your account is not verified.'], 403);
             }
             return response()->json([
+                "success" => true,
                 'status' => true,
                 'message' => 'User logged in successfully.',
                 'token' => $user->createToken('API TOKEN')->plainTextToken,
@@ -139,7 +142,7 @@ class AuthServiceImpl implements AuthServiceInterface
             $this->authRepository->createResetToken($request->email, $confirm_code);
         }
         $this->resetConfirmMail($exist_user, $confirm_code);
-        return response()->json(['message' => 'Reset email send'], 200);
+        return response()->json(['message' => 'Reset email send',"success" => true], 200);
     }
     /*
     ---------------------------------------------------------
@@ -159,7 +162,7 @@ class AuthServiceImpl implements AuthServiceInterface
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error sending email. Please try again later.'], 500);
         }
-        return response()->json(['message' => 'Successfully Update your Password'], 200);
+        return response()->json(['message' => 'Successfully Update your Password',"success" => true], 200);
     }
     /*
     ----------------------------------------------------------
