@@ -4,25 +4,32 @@ import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
 import { faFacebook, faGooglePlus } from "@fortawesome/free-brands-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios'
-import GuestLayout from "../layout/GuestLayout";
+import GuestLayout from "../../component/layout/GuestLayout";
 import Swal from 'sweetalert2'
-const Registration = () => {
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+const ForgetPassword = () => {
     const [formData, setFormData] = useState({
         email: ''
       });
+      const [validationError, setValidationError] = useState({
+        email:'',
+        password:''
+    })
     const navigate = useNavigate();
 
     async function handleSignUp(e) {
         e.preventDefault();
         try {
-          const response = await axios.post('http://localhost/api/auth/register', formData);
+          const response = await axios.post('http://localhost/api/auth/reset-password', formData);
           console.log(response);
 
           if (response.data.success) {
             setFormData({ email: '' });
             Swal.fire(
-              'Account created successfully',
-              'Verification link sent to your email.',
+              'Reset password',
+              'Reset password link send your email ',
               'success'
             );
           } else {
@@ -30,7 +37,22 @@ const Registration = () => {
             Swal.fire('Registration Failed', 'Please try again later.', 'error');
           }
         } catch (error) {
-          console.error('Error during registration:', error);
+            if (error.response) {
+                  console.error('Error during login:', error.response.data.message);
+                  toast.error(error.response.data.message, {
+                      position: "top-right",
+                      autoClose: 4000,
+                      hideProgressBar: false,
+                      closeOnClick: true,
+                      pauseOnHover: true,
+                      draggable: true,
+                      progress: undefined,
+                      theme: "light",
+                      });
+
+              } else {
+                console.error('Network error or request failed:', error.message);
+              }
         }
       }
 
@@ -40,13 +62,13 @@ const Registration = () => {
                 <div className="login-box">
                     <div className="card card-outline card-primary">
                         <div className="card-header text-center">
-                            <Link href="/" className="h1">
+                            <Link href="/src/pages" className="h1">
                                 <b>Admin</b>LTE
                             </Link>
                         </div>
                         <div className="card-body">
                             <p className="login-box-msg">
-                                Sign up to start your session
+                                Reset Password
                             </p>
                             <form onSubmit={(e) =>  handleSignUp(e)}>
                                 <div className="input-group mb-3">
@@ -57,7 +79,7 @@ const Registration = () => {
                                         id="email"
                                         name="email"
                                         value={formData.email}
-                                        autoComplete="username"
+                                        autoComplete="eamil"
                                         onChange={(e) =>
                                             setFormData({
                                                 ...formData,
@@ -74,71 +96,30 @@ const Registration = () => {
                                         </div>
                                     </div>
                                 </div>
-                                {/* <InputError
-                                message={errors.email}
-                                className="mt-2"
-                            /> */}
 
                                 <div className="row">
-                                    {/* <div className="col-8">
-                                    <div className="icheck-primary">
-                                        <input
-                                            type="checkbox"
-                                            name="remember"
-                                            checked={data.remember}
-                                            onChange={(e) =>
-                                                setData(
-                                                    "remember",
-                                                    e.target.checked
-                                                )
-                                            }
-                                        />
-                                        <label htmlFor="remember">
-                                            Remember Me
-                                        </label>
-                                    </div>
-                                </div> */}
 
-                                    <div className="col-4">
+                                    <div className="col-6">
                                         <button
                                             type="submit"
                                             className="btn btn-primary btn-block"
 
                                         >
-                                            Sign Up
+                                            Send Reset Link
                                         </button>
                                     </div>
                                 </div>
                             </form>
-                            <div className="social-auth-links text-center mt-2 mb-3">
-                                <a
-                                    href="#"
-                                    className="btn btn-block btn-primary"
-                                >
-                                    <FontAwesomeIcon icon={faFacebook} /> Sign
-                                    up using Facebook
-                                </a>
-                                <a
-                                    href="#"
-                                    className="btn btn-block btn-danger"
-                                >
-                                    <FontAwesomeIcon icon={faGooglePlus} /> Sign
-                                    up using Google+
-                                </a>
-                            </div>
-
-                            <p className="mb-1">
-                                <Link>Already have account?</Link>
-                            </p>
                             <p className="mb-0">
-                                <Link to="/login">Log In</Link>
+                                <Link to="/login">Sing In Page</Link>
                             </p>
                         </div>
                     </div>
                 </div>
+            <ToastContainer />
             </GuestLayout>
         </>
     );
 };
 
-export default Registration;
+export default ForgetPassword;

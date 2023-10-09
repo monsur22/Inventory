@@ -4,8 +4,11 @@ import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
 import { faFacebook, faGooglePlus } from "@fortawesome/free-brands-svg-icons";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from 'axios'
-import GuestLayout from "../layout/GuestLayout";
+import GuestLayout from "../../component/layout/GuestLayout";
 import Swal from 'sweetalert2';
+import Form from 'react-bootstrap/Form';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -16,7 +19,10 @@ const Login = () => {
     const location = useLocation();
     const query = new URLSearchParams(location.search);
     const passwordResetSuccess = query.get('passwordResetSuccess') === 'true';
-
+    const [validationError, setValidationError] = useState({
+        email:'',
+        password:''
+    })
     useEffect(() => {
       if (passwordResetSuccess) {
         Swal.fire({
@@ -33,7 +39,7 @@ const Login = () => {
         e.preventDefault();
         try {
           const response = await axios.post('http://localhost/api/auth/login', formData);
-          console.log(response)
+          console.log(response.data);
           if (response.data.success) {
             localStorage.setItem('token', response.data.token);
             window.location.href = '/';
@@ -41,16 +47,41 @@ const Login = () => {
             console.error('Login failed. No success in response.');
           }
         } catch (error) {
-          console.error('Error during login:', error);
+          if (error.response) {
+
+            if (error.response.data && error.response.data.data) {
+              const validationErrors = error.response.data.data;
+              console.log('Validation Errors:', validationErrors);
+              setValidationError({
+                email: validationErrors.email ? validationErrors.email[0] : '',
+                password: validationErrors.password ? validationErrors.password[0] : ''
+              });
+            } else {
+              console.error('Error during login:', error.response.data.message);
+              toast.error(error.response.data.message, {
+                  position: "top-right",
+                  autoClose: 4000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "light",
+                  });
+            }
+          } else {
+            console.error('Network error or request failed:', error.message);
+          }
         }
       }
+
     return (
         <>
             <GuestLayout>
                 <div className="login-box">
                     <div className="card card-outline card-primary">
                         <div className="card-header text-center">
-                            <Link href="/" className="h1">
+                            <Link href="/src/pages" className="h1">
                                 <b>Admin</b>LTE
                             </Link>
                         </div>
@@ -59,7 +90,7 @@ const Login = () => {
                                 Sign in to start your session
                             </p>
                             <form onSubmit={(e) =>  handleSignIn(e)}>
-                                <div className="input-group mb-3">
+                                <div className="input-group mt-3">
                                     <input
                                         type="email"
                                         className="form-control"
@@ -84,12 +115,8 @@ const Login = () => {
                                         </div>
                                     </div>
                                 </div>
-                                {/* <InputError
-                                message={errors.email}
-                                className="mt-2"
-                            /> */}
-
-                                <div className="input-group mb-3">
+                                {validationError.email && <div className="text-danger">{validationError.email}</div>}
+                                <div className="input-group mt-3">
                                     <input
                                         type="password"
                                         className="form-control"
@@ -114,36 +141,12 @@ const Login = () => {
                                         </div>
                                     </div>
                                 </div>
-                                {/* <InputError
-                                message={errors.password}
-                                className="mt-2"
-                            /> */}
-
+                                {validationError.password && <div className="text-danger" >{validationError.password}</div>}
                                 <div className="row">
-                                    {/* <div className="col-8">
-                                    <div className="icheck-primary">
-                                        <input
-                                            type="checkbox"
-                                            name="remember"
-                                            checked={data.remember}
-                                            onChange={(e) =>
-                                                setData(
-                                                    "remember",
-                                                    e.target.checked
-                                                )
-                                            }
-                                        />
-                                        <label htmlFor="remember">
-                                            Remember Me
-                                        </label>
-                                    </div>
-                                </div> */}
-
                                     <div className="col-4">
                                         <button
                                             type="submit"
-                                            className="btn btn-primary btn-block"
-
+                                            className="btn btn-primary btn-block mt-3"
                                         >
                                             Sign In
                                         </button>
@@ -152,14 +155,14 @@ const Login = () => {
                             </form>
                             <div className="social-auth-links text-center mt-2 mb-3">
                                 <a
-                                    href="#"
+                                    href="src/pages/Auth/Login#"
                                     className="btn btn-block btn-primary"
                                 >
                                     <FontAwesomeIcon icon={faFacebook} /> Sign
                                     in using Facebook
                                 </a>
                                 <a
-                                    href="#"
+                                    href="src/pages/Auth/Login#"
                                     className="btn btn-block btn-danger"
                                 >
                                     <FontAwesomeIcon icon={faGooglePlus} /> Sign
@@ -176,6 +179,7 @@ const Login = () => {
                         </div>
                     </div>
                 </div>
+            <ToastContainer />
             </GuestLayout>
         </>
     );

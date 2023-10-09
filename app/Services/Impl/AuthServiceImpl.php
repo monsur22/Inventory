@@ -72,7 +72,7 @@ class AuthServiceImpl implements AuthServiceInterface
     {
         $user = $this->authRepository->findByConfirmCode($confirm_code);
         if (!$user) {
-            return response()->json(["msg" => "Invalid user."], 400);
+            return response()->json(["message" => "Invalid user."], 400);
         }
         if ($this->isAccountNotVerified($user)) {
             $user->markEmailAsVerified();
@@ -81,17 +81,17 @@ class AuthServiceImpl implements AuthServiceInterface
                 Mail::to($user->email)->send(new RegistrationCompleteMail($user));
             } catch (\Exception $e) {
                 return response()->json([
-                    'msg' => 'Error sending email. Please try again later.'
+                    'message' => 'Error sending email. Please try again later.'
                 ], 500);
             }
             return response()->json([
                 "success" => true,
-                "msg" => "Email verified and password updated.",
+                "message" => "Email verified and password updated.",
                 'token' => $user->createToken("API TOKEN")->plainTextToken,
                 'token_type' => 'Bearer',
             ], 200);
         }
-        return response()->json(["msg" => "Email already verified."], 400);
+        return response()->json(["message" => "Email already verified."], 400);
     }
     /*
     ----------------------------------------------
@@ -104,7 +104,9 @@ class AuthServiceImpl implements AuthServiceInterface
         if (Auth::once($input)) {
             $user = Auth::user();
             if ($this->isAccountNotVerified($user)) {
-                return response()->json(['error' => 'Your account is not verified.'], 403);
+                return response()->json([
+                    'message' => 'Your account is not verified yet.'
+                ], 403);
             }
             return response()->json([
                 "success" => true,
@@ -116,9 +118,10 @@ class AuthServiceImpl implements AuthServiceInterface
         }
         return response()->json([
             'status' => false,
-            'message' => 'Invalid email and password.',
+            'message' => 'Invalid email or password.',
             'error' => 'Unauthorized'
         ], 401);
+
     }
     /*
     ----------------------------------------------
@@ -129,10 +132,10 @@ class AuthServiceImpl implements AuthServiceInterface
     {
         $exist_user = $this->authRepository->findUserByEmail($request->email);
         if (!$exist_user) {
-            return response()->json(['error' => 'Email not exist , Create a account'], 404);
+            return response()->json(['message' => 'Email not exist , Create a account'], 404);
         }
         if ($this->isAccountNotVerified($exist_user)) {
-            return response()->json(['error' => 'Your have not verified your open account.'], 401);
+            return response()->json(['message' => 'Your have not verified your open account.'], 401);
         }
         $confirm_code = Str::random(32);
         $token_exitst = $this->authRepository->tokenfindByEmail($request->email);
@@ -160,7 +163,7 @@ class AuthServiceImpl implements AuthServiceInterface
         try {
             Mail::to($token_details->email)->send(new PasswordUpdateMail($token_details));
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error sending email. Please try again later.'], 500);
+            return response()->json(['message' => 'Error sending email. Please try again later.'], 500);
         }
         return response()->json(['message' => 'Successfully Update your Password',"success" => true], 200);
     }
@@ -175,7 +178,7 @@ class AuthServiceImpl implements AuthServiceInterface
             Mail::to($exist_user->email)->send(new PasswordResetMail($exist_user, $confirm_code));
             return response()->json(['message' => 'Check your email']);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error sending email. Please try again later.'], 500);
+            return response()->json(['message' => 'Error sending email. Please try again later.'], 500);
         }
     }
     /*

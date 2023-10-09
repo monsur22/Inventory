@@ -5,7 +5,7 @@ import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
 import { faFacebook, faGooglePlus } from "@fortawesome/free-brands-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios'
-import GuestLayout from "../layout/GuestLayout";
+import GuestLayout from "../../component/layout/GuestLayout";
 import Swal from 'sweetalert2';
 function PasswrodReset() {
   const { token } = useParams();
@@ -42,7 +42,7 @@ function PasswrodReset() {
         <div className="login-box">
             <div className="card card-outline card-primary">
                 <div className="card-header text-center">
-                    <Link href="/" className="h1">
+                    <Link href="/src/pages" className="h1">
                         <b>Admin</b>LTE
                     </Link>
                 </div>

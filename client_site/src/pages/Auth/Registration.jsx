@@ -4,30 +4,46 @@ import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
 import { faFacebook, faGooglePlus } from "@fortawesome/free-brands-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios'
-import GuestLayout from "../layout/GuestLayout";
+import GuestLayout from "../../component/layout/GuestLayout";
 import Swal from 'sweetalert2'
-const ForgetPassword = () => {
+import { ToastContainer, toast } from 'react-toastify';
+const Registration = () => {
     const [formData, setFormData] = useState({
         email: ''
       });
     const navigate = useNavigate();
-
+    const [validationError, setValidationError] = useState({
+        email:'',
+        password:''
+    })
     async function handleSignUp(e) {
         e.preventDefault();
         try {
-          const response = await axios.post('http://localhost/api/auth/reset-password', formData);
+          const response = await axios.post('http://localhost/api/auth/register', formData);
           console.log(response);
 
           if (response.data.success) {
             setFormData({ email: '' });
             Swal.fire(
-              'Reset password',
-              'Reset password link send your email ',
+              'Account created successfully',
+              'Verification link sent to your email.',
               'success'
             );
           } else {
-            setFormData({ email: '' });
-            Swal.fire('Registration Failed', 'Please try again later.', 'error');
+            console.log(response.data.data.email[0])
+            if(response.data.data.email[0]){
+                setFormData({ email: '' });
+                toast.error(response.data.data.email[0], {
+                    position: "top-right",
+                    autoClose: 4000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    });
+            }
           }
         } catch (error) {
           console.error('Error during registration:', error);
@@ -40,13 +56,13 @@ const ForgetPassword = () => {
                 <div className="login-box">
                     <div className="card card-outline card-primary">
                         <div className="card-header text-center">
-                            <Link href="/" className="h1">
+                            <Link href="/src/pages" className="h1">
                                 <b>Admin</b>LTE
                             </Link>
                         </div>
                         <div className="card-body">
                             <p className="login-box-msg">
-                                Reset Password
+                                Sign up to start your session
                             </p>
                             <form onSubmit={(e) =>  handleSignUp(e)}>
                                 <div className="input-group mb-3">
@@ -57,7 +73,7 @@ const ForgetPassword = () => {
                                         id="email"
                                         name="email"
                                         value={formData.email}
-                                        autoComplete="eamil"
+                                        autoComplete="username"
                                         onChange={(e) =>
                                             setFormData({
                                                 ...formData,
@@ -99,31 +115,47 @@ const ForgetPassword = () => {
                                     </div>
                                 </div> */}
 
-                                    <div className="col-6">
+                                    <div className="col-4">
                                         <button
                                             type="submit"
                                             className="btn btn-primary btn-block"
 
                                         >
-                                            Send Reset Link
+                                            Sign Up
                                         </button>
                                     </div>
                                 </div>
                             </form>
+                            <div className="social-auth-links text-center mt-2 mb-3">
+                                <a
+                                    href="src/pages/Auth/Registration#"
+                                    className="btn btn-block btn-primary"
+                                >
+                                    <FontAwesomeIcon icon={faFacebook} /> Sign
+                                    up using Facebook
+                                </a>
+                                <a
+                                    href="src/pages/Auth/Registration#"
+                                    className="btn btn-block btn-danger"
+                                >
+                                    <FontAwesomeIcon icon={faGooglePlus} /> Sign
+                                    up using Google+
+                                </a>
+                            </div>
 
-
-                            {/* <p className="mb-1">
+                            <p className="mb-1">
                                 <Link>Already have account?</Link>
                             </p>
                             <p className="mb-0">
                                 <Link to="/login">Log In</Link>
-                            </p> */}
+                            </p>
                         </div>
                     </div>
                 </div>
+            <ToastContainer />
             </GuestLayout>
         </>
     );
 };
 
-export default ForgetPassword;
+export default Registration;

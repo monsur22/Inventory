@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\LoginRegister;
+use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegistrationRequest;
 use App\Http\Requests\ResetRequest;
 use App\Http\Requests\UpdateRequest;
@@ -54,7 +54,7 @@ class AuthController extends Controller
     | If verified user loged in and generate token.
     ----------------------------------------------------------------
     */
-    public function loginUser(LoginRegister $request)
+    public function loginUser(LoginRequest $request)
     {
         $user_details = $this->authService->loginUser( $request);
         return $user_details;

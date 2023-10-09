@@ -1,5 +1,5 @@
 import React from 'react'
-import AuthLayout from '../layout/AuthLayout'
+import AuthLayout from '../../component/layout/AuthLayout'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faEye, faTrash, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from 'react';
@@ -8,8 +8,10 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import axios from 'axios'
 import SupplierShow from './SupplierShow';
-import Pagination from './Pagination';
+import Pagination from '../Pagination/Pagination';
 import Swal from 'sweetalert2';
+import LoadingSpinner from "../../component/Loading/LoadingSpinner";
+import useLoading from "../../component/Loading/useLoading";
 
 const Supplier = () => {
     const [show, setShow] = useState(false);
@@ -22,6 +24,8 @@ const Supplier = () => {
     const [editedSupplierId, setEditedSupplierId] = useState(null);
     const [isSupplierModalOpen, setIsSupplierModalOpen] = useState(false);
     const [singleSupplier, setSingleSupplier] = useState('')
+    const isLoading = useLoading();
+
     //pagination start
     const itemsPerPage = 4; // Number of items to display per page
 
@@ -123,19 +127,30 @@ const Supplier = () => {
       }
 
     function handleDelete(id) {
-        axios.delete(`http://localhost/api/supplier/${id}`)
-            .then((response) => {
-                const updatedSuppliers = suppliers.filter((supplier) => supplier.id !== id);
-                setSuppliers(updatedSuppliers);
-            })
-            .catch((error) => {
-                console.error('Error fetching product data:', error);
-            });
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You will not be able to recover this category!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.delete(`http://localhost/api/supplier/${id}`)
+                    .then((response) => {
+                        const updatedSuppliers = suppliers.filter((supplier) => supplier.id !== id);
+                        setSuppliers(updatedSuppliers);
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching product data:', error);
+                    });
+            }
+        });
     }
     function handleSupplierShow(id){
         console.log(id)
-        axios
-            .get(`http://localhost/api/supplier/${id}`)
+        axios.get(`http://localhost/api/supplier/${id}`)
             .then((response) => {
                 const singleSupplier = response.data.supplier
                 console.log(singleSupplier)
@@ -145,9 +160,6 @@ const Supplier = () => {
             .catch((error) => {
                 console.error("Error updating products:", error);
             });
-
-
-
     }
 console.log(suppliers)
 
@@ -247,15 +259,16 @@ console.log(suppliers)
                           </div>
 
                           <div className="card-body">
-                              <table className="table table-bordered">
-                                  <thead>
+                              {isLoading ? <LoadingSpinner/> :
+                                  <table className="table table-bordered">
+                                      <thead>
                                       <tr>
-                                          <th style={{ width: 10 }}>#</th>
+                                          <th style={{width: 10}}>#</th>
                                           <th>Tittle</th>
-                                          <th style={{ width: 20 }}>Action</th>
+                                          <th style={{width: 20}}>Action</th>
                                       </tr>
-                                  </thead>
-                                  <tbody>
+                                      </thead>
+                                      <tbody>
                                       {currentItems.map((item) => (
                                           <tr key={item.id}>
                                               <td>{item.id}</td>
@@ -268,10 +281,10 @@ console.log(suppliers)
                                                           <FontAwesomeIcon
                                                               icon={faEye}
                                                               onClick={() =>
-                                                                handleSupplierShow(
-                                                                    item.id
-                                                                )
-                                                            }
+                                                                  handleSupplierShow(
+                                                                      item.id
+                                                                  )
+                                                              }
                                                           />
                                                       </a>
 
@@ -299,8 +312,9 @@ console.log(suppliers)
                                               </td>
                                           </tr>
                                       ))}
-                                  </tbody>
-                              </table>
+                                      </tbody>
+                                  </table>
+                              }
                           </div>
                           {/* pagination will be here */}
                           <Pagination

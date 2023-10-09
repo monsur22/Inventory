@@ -1,5 +1,5 @@
 import React from 'react'
-import AuthLayout from '../layout/AuthLayout'
+import AuthLayout from '../../component/layout/AuthLayout'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faEye, faTrash, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from 'react';
@@ -7,8 +7,11 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import axios from 'axios'
-import Pagination from './Pagination';
+import Pagination from '../Pagination/Pagination';
 import Swal from 'sweetalert2';
+import WithLoading from "../../component/Loading/LoadingHOC";
+import LoadingSpinner from "../../component/Loading/LoadingSpinner";
+import useLoading from "../../component/Loading/useLoading";
 
 const Category = () => {
     const [show, setShow] = useState(false);
@@ -23,6 +26,9 @@ const Category = () => {
     const itemsPerPage = 4; // Number of items to display per page
 
     const [currentPage, setCurrentPage] = useState(0);
+
+    const isLoading = useLoading();
+
 
     const handlePageChange = (selectedPage) => {
       setCurrentPage(selectedPage.selected);
@@ -218,25 +224,26 @@ console.log(categories)
                     </div>
 
                     <div className="card-body">
-                        <table className="table table-bordered">
-                            <thead>
+                        {isLoading ? <LoadingSpinner/> :
+                            <table className="table table-bordered">
+                                <thead>
                                 <tr>
-                                    <th style={{ width: 10 }}>#</th>
+                                    <th style={{width: 10}}>#</th>
                                     <th>Tittle</th>
-                                    <th style={{ width: 20 }}>
+                                    <th style={{width: 20}}>
                                         Action
                                     </th>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {currentItems.map((item)=>(
+                                </thead>
+                                <tbody>
+                                {currentItems.map((item) => (
                                     <tr key={item.id}>
                                         <td>{item.id}</td>
                                         <td>{item.title}</td>
                                         <td>
                                             <div className="btn-group btn-group-sm">
                                                 <a
-                                                    href=""
+                                                    href="src/pages/Category/Category"
                                                     className="btn btn-success"
                                                 >
                                                     <FontAwesomeIcon
@@ -244,7 +251,7 @@ console.log(categories)
                                                     />
                                                 </a>
 
-                                                <a  className="btn btn-info">
+                                                <a className="btn btn-info">
                                                     <FontAwesomeIcon
                                                         icon={
                                                             faEdit
@@ -270,9 +277,12 @@ console.log(categories)
                                 ))}
 
 
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        }
                     </div>
+
+
                     {/* pagination will be here */}
                     <Pagination
                         pageCount={Math.ceil(categories.length / itemsPerPage)}
@@ -285,5 +295,6 @@ console.log(categories)
 </AuthLayout>
   )
 }
+// export default WithLoading(Category); // Wrap your component with the HOC
 
 export default Category

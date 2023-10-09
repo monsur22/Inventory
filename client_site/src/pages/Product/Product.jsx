@@ -1,5 +1,5 @@
 import React from 'react';
-import AuthLayout from "../layout/AuthLayout";
+import AuthLayout from "../../component/layout/AuthLayout";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faEye, faTrash, faTimes } from "@fortawesome/free-solid-svg-icons";
 
@@ -9,8 +9,10 @@ import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import axios from "axios";
 import ProductShow from "./ProductShow";
-import Pagination from './Pagination';
+import Pagination from '../Pagination/Pagination';
 import Swal from 'sweetalert2';
+import LoadingSpinner from "../../component/Loading/LoadingSpinner";
+import useLoading from "../../component/Loading/useLoading";
 
 
 const Product = () => {
@@ -29,6 +31,7 @@ const Product = () => {
     });
     const [editMode, setEditMode] = useState(false); // Add editMode state
     const [editedProductId, setEditedProductId] = useState(null);
+    const isLoading = useLoading();
 //pagination start
     const itemsPerPage = 4; // Number of items to display per page
 
@@ -182,17 +185,29 @@ const Product = () => {
     }
 
     function handleDelete(id) {
-        axios
-            .delete(`http://localhost/api/product/${id}`)
-            .then((response) => {
-                const updatedProducts= products.filter(
-                    (product) => product.id !== id
-                );
-                setProducts(updatedProducts);
-            })
-            .catch((error) => {
-                console.error("Error fetching product data:", error);
-            });
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You will not be able to recover this category!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios
+                    .delete(`http://localhost/api/product/${id}`)
+                    .then((response) => {
+                        const updatedProducts= products.filter(
+                            (product) => product.id !== id
+                        );
+                        setProducts(updatedProducts);
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching product data:", error);
+                    });
+            }
+        });
     }
     function handleProductShow(id){
         console.log(id)
@@ -417,21 +432,22 @@ const Product = () => {
                             </div>
 
                             <div className="card-body">
-                                <table className="table table-bordered">
-                                    <thead>
+                                {isLoading ? <LoadingSpinner/> :
+                                    <table className="table table-bordered">
+                                        <thead>
                                         <tr>
-                                            <th style={{ width: 10 }}>#</th>
+                                            <th style={{width: 10}}>#</th>
                                             <th>Tittle</th>
                                             <th>Supplier</th>
                                             <th>Price</th>
                                             <th>Quantity</th>
                                             <th>Image</th>
-                                            <th style={{ width: 20 }}>
+                                            <th style={{width: 20}}>
                                                 Action
                                             </th>
                                         </tr>
-                                    </thead>
-                                    <tbody>
+                                        </thead>
+                                        <tbody>
                                         {currentItems.map((item) => (
                                             <tr key={item.id}>
                                                 <td>{item.id}</td>
@@ -440,7 +456,8 @@ const Product = () => {
                                                 <td>{item.price}</td>
                                                 <td>{item.quantity}</td>
                                                 <td>
-                                                    <img height={'50px'} src={`http://localhost/${item.image_path}`} alt="Product" />
+                                                    <img height={'50px'} src={`http://localhost/${item.image_path}`}
+                                                         alt="Product"/>
                                                 </td>
                                                 <td>
                                                     <div className="btn-group btn-group-sm">
@@ -481,8 +498,9 @@ const Product = () => {
                                                 </td>
                                             </tr>
                                         ))}
-                                    </tbody>
-                                </table>
+                                        </tbody>
+                                    </table>
+                                }
                             </div>
                             {/* pagination will be here */}
                             <Pagination

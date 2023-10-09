@@ -98,7 +98,7 @@ const Sidebar = () => {
                             </a>
                         </li>
                         <li className="nav-item">
-                            <a href="#" className="nav-link">
+                            <a href="" className="nav-link">
                                 <FontAwesomeIcon
                                     icon={faCopy}
                                     className="nav-icon"

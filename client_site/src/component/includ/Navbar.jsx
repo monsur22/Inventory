@@ -22,7 +22,9 @@ const Navbar = () => {
           });
           if (response.data.status === 'success') {
             localStorage.removeItem('token');
-            navigate('/login');
+            // navigate('/login');
+            window.location.href = '/login';
+
           } else {
             // Handle logout failure
             console.error('Logout failed');

@@ -1,5 +1,5 @@
 import React from 'react'
-import AuthLayout from '../layout/AuthLayout'
+import AuthLayout from '../component/layout/AuthLayout'
 
 const NewPage = () => {
   return (
