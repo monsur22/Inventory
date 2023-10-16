@@ -11,14 +11,14 @@ import {
 const Sidebar = () => {
     return (
         <aside className="main-sidebar sidebar-dark-primary elevation-4">
-            <a href="index3.html" className="brand-link">
+            <Link to="/" className="brand-link">
                 <img
                     src="/assets/img/AdminLTELogo.png"
                     alt="AdminLTE Logo"
                     className="brand-image img-circle elevation-3"
                 />
                 <span className="brand-text font-weight-light">Inventory</span>
-            </a>
+            </Link>
 
             <div className="sidebar">
                 <div className="user-panel mt-3 pb-3 mb-3 d-flex">
@@ -65,7 +65,10 @@ const Sidebar = () => {
                                     icon={faTh}
                                     className="nav-icon"
                                 />
-                            <Link to="/" relative="path"> Dashboard</Link>
+                                <Link to="/" relative="path">
+                                    {" "}
+                                    Dashboard
+                                </Link>
                             </a>
                         </li>
                         <li className="nav-item">
@@ -74,8 +77,10 @@ const Sidebar = () => {
                                     icon={faCopy}
                                     className="nav-icon"
                                 />
-                            <Link to="/newpage" relative="path"> New Page</Link>
-
+                                <Link to="/newpage" relative="path">
+                                    {" "}
+                                    New Page
+                                </Link>
                             </a>
                         </li>
                         <li className="nav-item">
@@ -84,7 +89,10 @@ const Sidebar = () => {
                                     icon={faCopy}
                                     className="nav-icon"
                                 />
-                            <Link to="/category" relative="path"> Category</Link>
+                                <Link to="/customers" relative="path">
+                                    {" "}
+                                    Customer
+                                </Link>
                             </a>
                         </li>
                         <li className="nav-item">
@@ -93,8 +101,10 @@ const Sidebar = () => {
                                     icon={faCopy}
                                     className="nav-icon"
                                 />
-                            <Link to="/supplier" relative="path"> Supplier</Link>
-
+                                <Link to="/category" relative="path">
+                                    {" "}
+                                    Category
+                                </Link>
                             </a>
                         </li>
                         <li className="nav-item">
@@ -103,8 +113,34 @@ const Sidebar = () => {
                                     icon={faCopy}
                                     className="nav-icon"
                                 />
-                            <Link to="/product" relative="path"> Product</Link>
-
+                                <Link to="/supplier" relative="path">
+                                    {" "}
+                                    Supplier
+                                </Link>
+                            </a>
+                        </li>
+                        <li className="nav-item">
+                            <a href="" className="nav-link">
+                                <FontAwesomeIcon
+                                    icon={faCopy}
+                                    className="nav-icon"
+                                />
+                                <Link to="/products" relative="path">
+                                    {" "}
+                                    Product
+                                </Link>
+                            </a>
+                        </li>
+                        <li className="nav-item">
+                            <a href="" className="nav-link">
+                                <FontAwesomeIcon
+                                    icon={faCopy}
+                                    className="nav-icon"
+                                />
+                                <Link to="/pos" relative="path">
+                                    {" "}
+                                    POS
+                                </Link>
                             </a>
                         </li>
                     </ul>

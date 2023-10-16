@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SupplierController;
 use Illuminate\Http\Request;
@@ -39,3 +40,4 @@ Route::resource('category', CategoryController::class);
 Route::resource('supplier', SupplierController::class);
 Route::resource('product', ProductController::class);
 Route::post('/product/update/{id}', [ProductController::class, 'update'])->name('products.update');
+Route::resource('customers', CustomerController::class);

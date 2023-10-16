@@ -16,6 +16,8 @@ import ForgetPassword from './pages/Auth/ForgetPassword';
 import PasswrodReset from './pages/Auth/PasswrodReset';
 import PublicRoute from './component/Route/PublicRoute ';
 import PrivateRoute from './component/Route/PrivateRoute '
+import Customers from './pages/Customer/Customers';
+import Pos from './pages/Pos/Pos';
 
 function App() {
     return (
@@ -37,7 +39,9 @@ function App() {
                         <Route path="/newpage" element={<NewPage />} />
                         <Route path="/category" element={<Category />} />
                         <Route path="/supplier" element={<Supplier />} />
-                        <Route path="/product" element={<Product />} />
+                        <Route path="/products" element={<Product />} />
+                        <Route path="/customers" element={<Customers />} />
+                        <Route path="/pos" element={<Pos />} />
                     </Route>
                 </Routes>
             </Router>
