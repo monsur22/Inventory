@@ -33,6 +33,54 @@ const Pos = () => {
     const [editedProductId, setEditedProductId] = useState(null);
     const isLoading = useLoading();
 
+    const [cart, setCart] = useState([]);
+
+    const addToCart = (product) => {
+        const existingProductIndex = cart.findIndex((item) => item.id === product.id);
+
+        if (existingProductIndex !== -1) {
+          const updatedCart = [...cart];
+          updatedCart[existingProductIndex].quantity += 1;
+          setCart(updatedCart);
+        } else {
+          setCart([...cart, { ...product, quantity: 1 }]);
+        }
+    };
+    const incrementQuantity = (product) => {
+        const updatedCart = cart.map((item) => {
+          if (item.id === product.id) {
+            return { ...item, quantity: item.quantity + 1 };
+          }
+          return item;
+        });
+        setCart(updatedCart);
+      };
+
+      const decrementQuantity = (product) => {
+        const updatedCart = cart.map((item) => {
+          if (item.id === product.id && item.quantity > 1) {
+            return { ...item, quantity: item.quantity - 1 };
+          }
+          return item;
+        });
+        setCart(updatedCart);
+      };
+
+      const calculateTotalPrice = (product) => {
+        return product.price * product.quantity;
+      };
+
+      const calculateSubtotal = () => {
+        let subtotal = 0;
+        for (const item of cart) {
+          subtotal += item.price * item.quantity;
+        }
+        return subtotal;
+      };
+      const removeFromCart = (productId) => {
+        const updatedCart = cart.filter((item) => item.id !== productId);
+        setCart(updatedCart);
+      };
 
     const handleClose = () => {
         setShow(false);
@@ -215,7 +263,7 @@ const Pos = () => {
         console.log(isProductModalOpen)
 
     }
-    console.log(products);
+    console.log(cart);
 
     return (
         <AuthLayout
@@ -229,52 +277,54 @@ const Pos = () => {
 
         <div className="app-container">
             <div className="product-page-container">
-                <h1>Product Page</h1>
+                <h3>Product List</h3>
                 <div className="product-list">
                     {products.map((product) => (
                         <div key={product.id} className="product-item">
                             <img src={`http://localhost/${product.image_path}`} alt={product.title}/>
                             <h2>{product.title}</h2>
                             <p>Price: ${product.price}</p>
-                            <button >Add to Cart</button>
+                            <button  onClick={() => addToCart(product)}>Add to Cart</button>
                         </div>
                     ))}
                 </div>
             </div>
 
             <div className="cart">
-                <h2>Your Shopping Cart</h2>
-                {/* {cart.length === 0 ? (
+                <h2>Product Cart</h2>
+                {cart.length === 0 ? (
                     <p>Your cart is empty</p>
-                ) : ( */}
+                ) : (
                     <>
                         <ul>
-                            {/* {cart.map((cartItem) => ( */}
+                            {cart.map((cartItem) => (
                                 <li  className="cart-item">
                                     <div className="product-details">
-                                        {/*<img src={cartItem.product.image} alt={cartItem.product.title} />*/}
+                                        {/* <img src={`http://localhost/${cartItem.image_path}`} /> */}
                                         <div className="product-info">
-                                            {/* <h3>{cartItem.product.title}</h3> */}
-                                            <h3>title</h3>
+                                            <h3>{cartItem.title}</h3>
 
                                         </div>
                                     </div>
                                     <div className="quantity-controls">
-                                        <button >-</button>
-                                        <span></span>
-                                        <button >+</button>
+                                        <button onClick={() => decrementQuantity(cartItem)}>-</button>
+                                        <span>{cartItem.quantity}</span>
+                                        <button onClick={() => incrementQuantity(cartItem)}>+</button>
                                     </div>
-                                    <p>$</p>
-                                    <button className="remove-button" >Remove
+                                    <p>$ {calculateTotalPrice(cartItem)}</p>
+                                    <button className="remove-button" onClick={() => removeFromCart(cartItem.id)}>Remove
                                     </button>
                                 </li>
-                            {/* ))} */}
+                            ))}
                         </ul>
                         <div className="cart-summary">
-                            <p>Subtotal: $</p>
+                            <p>Subtotal: $ {calculateSubtotal()} </p>
                         </div>
                     </>
-                {/* )} */}
+
+                )}
+                    <button >Pay Cash</button>
+
             </div>
         </div>
 

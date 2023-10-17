@@ -40,9 +40,18 @@ button:hover {
 
 .product-page-container {
     width: 50%;
+    height: 550px; 
     display: flex;
     flex-direction: column;
     align-items: center;
+    border: 1px solid #e0e0e0;
+    background: white;
+    border-radius: 5px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-right: 5px;
+    overflow-y: auto; /* Enable vertical scrolling */
+
 }
 
 .product-list {
