@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('customer_id'); // Foreign key to reference the customer
-            $table->decimal('total_price', 10, 2); // Total price of the order
+            $table->unsignedBigInteger('order_id');
+            $table->string('payment_method');
+            $table->decimal('amount', 10, 2);
+            $table->string('transaction_id');
             $table->unsignedTinyInteger('status')->default(0); // Change to the appropriate size for your statuses
             $table->timestamps();
 
-            $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
+            $table->foreign('order_id')->references('id')->on('orders');
         });
     }
 
@@ -27,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('orders');
+        Schema::dropIfExists('payments');
     }
 };

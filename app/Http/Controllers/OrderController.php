@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -28,7 +30,37 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // dd($request->all());
+        try {
+            DB::beginTransaction();
+
+            // Create the order
+            $order = Order::create([
+                'customer_id' => $request->customer_id,
+                'total_price' => $request->total_price,
+                'status' => 0,
+            ]);
+
+            // Create order items related to the order
+            foreach ($request->order_items as $item) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item['product_id'],
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                    'subtotal' => $item['subtotal'],
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json(['message' => 'Order and Order Items created successfully', 'order_id' => $order->id], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            // Log the error or handle it as required
+            return response()->json(['message' => 'Failed to create order and order items'], 500);
+        }
     }
 
     /**

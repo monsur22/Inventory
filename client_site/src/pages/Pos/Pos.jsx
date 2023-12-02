@@ -35,6 +35,8 @@ const Pos = () => {
 
     const [cart, setCart] = useState([]);
 
+    const [searchQuery, setSearchQuery] = useState('');
+
     const addToCart = (product) => {
         const existingProductIndex = cart.findIndex((item) => item.id === product.id);
 
@@ -42,8 +44,12 @@ const Pos = () => {
           const updatedCart = [...cart];
           updatedCart[existingProductIndex].quantity += 1;
           setCart(updatedCart);
+          localStorage.setItem('cart', JSON.stringify(updatedCart)); // Save updated cart to local storage
         } else {
-          setCart([...cart, { ...product, quantity: 1 }]);
+        //   setCart([...cart, { ...product, quantity: 1 }]);
+        const updatedCart = [...cart, { ...product, quantity: 1 }];
+        setCart(updatedCart);
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
         }
     };
     const incrementQuantity = (product) => {
@@ -54,9 +60,10 @@ const Pos = () => {
           return item;
         });
         setCart(updatedCart);
-      };
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
+    };
 
-      const decrementQuantity = (product) => {
+    const decrementQuantity = (product) => {
         const updatedCart = cart.map((item) => {
           if (item.id === product.id && item.quantity > 1) {
             return { ...item, quantity: item.quantity - 1 };
@@ -64,23 +71,26 @@ const Pos = () => {
           return item;
         });
         setCart(updatedCart);
-      };
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
+    };
 
-      const calculateTotalPrice = (product) => {
+    const calculateTotalPrice = (product) => {
         return product.price * product.quantity;
-      };
+    };
 
-      const calculateSubtotal = () => {
+    const calculateSubtotal = () => {
         let subtotal = 0;
         for (const item of cart) {
           subtotal += item.price * item.quantity;
         }
         return subtotal;
-      };
-      const removeFromCart = (productId) => {
+    };
+
+    const removeFromCart = (productId) => {
         const updatedCart = cart.filter((item) => item.id !== productId);
         setCart(updatedCart);
-      };
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
+    };
 
     const handleClose = () => {
         setShow(false);
@@ -92,7 +102,14 @@ const Pos = () => {
         getProducts();
         getCategory();
         getSupplier();
-    }, []);
+        const savedCart = localStorage.getItem('cart');
+        if (savedCart) {
+            setCart(JSON.parse(savedCart));
+        }
+
+        getProductsBySearch();
+
+}, [searchQuery]);
     const resetForm = () => {
         setFormData({
           title: "",
@@ -137,6 +154,33 @@ const Pos = () => {
                 console.error("Error fetching product data:", error);
             });
     }
+
+    function getProductsByCategory(categoryId) {
+        const apiUrl = categoryId ? `http://localhost/api/products/get-by-category/${categoryId}` : `http://localhost/api/product`;
+
+        axios
+            .get(apiUrl)
+            // .get(`http://localhost/api/products/get-by-category/${categoryId}`)
+            .then((response) => {
+                const productsData = response.data;
+                setProducts(productsData); // Update state with fetched data
+            })
+            .catch((error) => {
+                console.error("Error fetching product data:", error);
+            });
+    }
+
+    const getProductsBySearch = () => {
+        axios.get(`http://localhost/api/products/get-by-search?query=${searchQuery}`)
+        .then((response) => {
+            const productsData = response.data;
+            setProducts(productsData);
+        })
+        .catch((error) => {
+            console.error("Error fetching product data:", error);
+        });
+    };
+
     function handleSubmit(e) {
         e.preventDefault();
         axios
@@ -263,7 +307,11 @@ const Pos = () => {
         console.log(isProductModalOpen)
 
     }
-    console.log(cart);
+
+    const handleSearch = (e) => {
+        setSearchQuery(e.target.value);
+    };
+    console.log(products);
 
     return (
         <AuthLayout
@@ -278,6 +326,26 @@ const Pos = () => {
         <div className="app-container">
             <div className="product-page-container">
                 <h3>Product List</h3>
+                <div style={{ marginBottom: '5px' }} >
+                    <select
+                    onChange={(e) => getProductsByCategory(e.target.value)}
+
+                    >
+                        <option value="">All Categories</option>
+                            {categories.map((category) => (
+                                <option key={category.title} value={category.id}>
+                                    {category.title}
+                        </option>
+                        ))}
+                    </select>
+                    <input   type="text"
+                    placeholder="Search products..."
+                    value={searchQuery}
+                    onChange={handleSearch}
+                    style={{ marginLeft: '10px' }} // Inline style for left-side margin
+
+                    />
+                </div>
                 <div className="product-list">
                     {products.map((product) => (
                         <div key={product.id} className="product-item">

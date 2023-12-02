@@ -104,22 +104,7 @@ class ProductController extends Controller
         // Handle the image update
         $imagePath = $product->image_path; // Get the current image path
 
-        // if ($request->hasFile('image')) {
-        //     $uploadedFile = $request->file('image');
-        //     if ($uploadedFile->isValid()) {
-        //         // Unlink (delete) the old image
-        //         if ($imagePath) {
-        //             $oldImagePath = public_path($imagePath);
-        //             if (file_exists($oldImagePath)) {
-        //                 unlink($oldImagePath);
-        //             }
-        //         }
-        //         // Store the new image
-        //         $imagePath = $uploadedFile->store('images', 'public');
-        //     } else {
-        //         return response()->json(['error' => 'Invalid file.']);
-        //     }
-        // }
+
         if ($request->hasFile('image')) {
             $uploadedFile = $request->file('image');
             if ($uploadedFile->isValid()) {
@@ -174,5 +159,21 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to delete product'], 500);
         }
+    }
+
+    public function getByCategory( $category)
+    {
+        $products = Product::where('category_id', $category)->get();
+        return response()->json($products, 200);
+    }
+
+    public function getBySearch( Request $request)
+    {
+        $searchQuery = $request->input('query');
+
+        $products = Product::where('title', 'like', "%$searchQuery%")
+            ->orWhere('description', 'like', "%$searchQuery%")
+            ->get();
+        return response()->json($products, 200);
     }
 }
