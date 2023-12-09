@@ -176,4 +176,5 @@ class ProductController extends Controller
             ->get();
         return response()->json($products, 200);
     }
+
 }

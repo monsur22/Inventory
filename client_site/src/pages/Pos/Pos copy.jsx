@@ -130,7 +130,7 @@ const Pos = () => {
         }
 
         getProductsBySearch();
-        // fetchData();
+        fetchData();
 }, [searchQuery]);
     const resetForm = () => {
         setFormData({
@@ -341,12 +341,11 @@ const Pos = () => {
         // Retrieve cart data from local storage
 
         const subtotal = localStorage.getItem('subtotal');
-            console.log(cartData);
+console.log(cartData);
         // Prepare data to send to the backend
         const requestData = {
             customer_id: 2,
             total_price: subtotal,
-            status:0,
             order_items: cartData,
         };
         console.log(requestData)
@@ -354,8 +353,9 @@ const Pos = () => {
         axios.post('http://localhost/api/orders',requestData)
             .then((response) => {
                 console.log('Order placed successfully:', response.data);
-                localStorage.removeItem('cart');
-                localStorage.removeItem('subtotal');
+                // Optionally, clear cart data from local storage after successful order placement
+                // localStorage.removeItem('cart');
+                // localStorage.removeItem('subtotal');
             })
             .catch((error) => {
                 console.error('Error placing order:', error);
@@ -366,11 +366,7 @@ const Pos = () => {
 
     const fetchData = async () => {
       try {
-        const requestData = {
-            title: 'Heelo test' ,
-            desc: 'desc test',
-        };
-        const response = await axios.post('http://localhost/api/test',requestData);
+        const response = await axios.get('http://localhost/api/test');
         console.log('Response:', response.data);
         setResponseData(response.data); // Assuming you want to store the response in state
       } catch (error) {
