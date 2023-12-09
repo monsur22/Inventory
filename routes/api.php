@@ -6,6 +6,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\TestController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +34,9 @@ Route::group(['middleware' => 'api','prefix'=>'auth'], function ($router) {
     ***    This  route will be for view password update form     ******/
 });
 
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
 Route::group(['middleware' => ['auth:sanctum']], function() {
     Route::get('/user', [AuthController::class, 'user']);
@@ -43,5 +47,10 @@ Route::resource('product', ProductController::class);
 Route::post('/product/update/{id}', [ProductController::class, 'update'])->name('products.update');
 Route::resource('customers', CustomerController::class);
 Route::resource('orders',OrderController::class);
+// Route::post('/product/orders', [OrderController::class, 'store']);
+// Route::post('/test', [OrderController::class, 'test']);
+
 Route::get('/products/get-by-category/{id}',[ProductController::class,'getByCategory']);
 Route::get('/products/get-by-search', [ProductController::class, 'getBySearch']);
+
+Route::post('/test', [TestController::class, 'test']);

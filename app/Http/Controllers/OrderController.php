@@ -14,7 +14,8 @@ class OrderController extends Controller
      */
     public function index()
     {
-        //
+        $order = Order::all();
+        return response()->json($order);
     }
 
     /**
@@ -30,7 +31,6 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
         try {
             DB::beginTransaction();
 
@@ -45,7 +45,7 @@ class OrderController extends Controller
             foreach ($request->order_items as $item) {
                 OrderItem::create([
                     'order_id' => $order->id,
-                    'product_id' => $item['product_id'],
+                    'product_id' => $item['id'],
                     'quantity' => $item['quantity'],
                     'price' => $item['price'],
                     'subtotal' => $item['subtotal'],
@@ -68,7 +68,8 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        //
+
+
     }
 
     /**
@@ -93,5 +94,9 @@ class OrderController extends Controller
     public function destroy(Order $order)
     {
         //
+    }
+
+    public function test(){
+        dd("test");
     }
 }
