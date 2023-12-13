@@ -47,8 +47,7 @@ Route::resource('product', ProductController::class);
 Route::post('/product/update/{id}', [ProductController::class, 'update'])->name('products.update');
 Route::resource('customers', CustomerController::class);
 Route::resource('orders',OrderController::class);
-// Route::post('/product/orders', [OrderController::class, 'store']);
-// Route::post('/test', [OrderController::class, 'test']);
+
 
 Route::get('/products/get-by-category/{id}',[ProductController::class,'getByCategory']);
 Route::get('/products/get-by-search', [ProductController::class, 'getBySearch']);

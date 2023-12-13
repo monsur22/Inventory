@@ -39,6 +39,10 @@ const Pos = () => {
 
     const [subtotal, setSubtotal] = useState(0);
 
+    const [customers, setCustomers] = useState([]); // Use categories, not data
+
+    const [selectedCustomer, setSelectedCustomer] = useState('');
+
     const addToCart = (product) => {
         const existingProductIndex = cart.findIndex((item) => item.id === product.id);
 
@@ -80,13 +84,7 @@ const Pos = () => {
         return product.price * product.quantity;
     };
 
-    // const calculateSubtotal = () => {
-    //     let subtotal = 0;
-    //     for (const item of cart) {
-    //       subtotal += item.price * item.quantity;
-    //     }
-    //     return subtotal;
-    // };
+
     useEffect(() => {
         const storedCart = localStorage.getItem('cart');
         if (storedCart) {
@@ -130,6 +128,7 @@ const Pos = () => {
         }
 
         getProductsBySearch();
+        getCustomers();
         // fetchData();
 }, [searchQuery]);
     const resetForm = () => {
@@ -203,6 +202,17 @@ const Pos = () => {
         });
     };
 
+    function getCustomers() {
+        axios
+            .get("http://localhost/api/customers")
+            .then((response) => {
+                const cutomersData = response.data;
+                setCustomers(cutomersData); // Update state with fetched data
+            })
+            .catch((error) => {
+                console.error("Error fetching customers data:", error);
+            });
+    }
     function handleSubmit(e) {
         e.preventDefault();
         axios
@@ -344,7 +354,7 @@ const Pos = () => {
             console.log(cartData);
         // Prepare data to send to the backend
         const requestData = {
-            customer_id: 2,
+            customer_id: selectedCustomer,
             total_price: subtotal,
             status:0,
             order_items: cartData,
@@ -356,6 +366,8 @@ const Pos = () => {
                 console.log('Order placed successfully:', response.data);
                 localStorage.removeItem('cart');
                 localStorage.removeItem('subtotal');
+                setCart([]); // Assuming setCart is the state setter for cart items
+                setSelectedCustomer(''); // Assuming setSelectedCustomer is the state setter for selected customer
             })
             .catch((error) => {
                 console.error('Error placing order:', error);
@@ -394,86 +406,135 @@ const Pos = () => {
             }
         >
             <div>
-
-        <div className="app-container">
-            <div className="product-page-container">
-                <h3>Product List</h3>
-                <div style={{ marginBottom: '5px' }} >
-                    <select
-                    onChange={(e) => getProductsByCategory(e.target.value)}
-
-                    >
-                        <option value="">All Categories</option>
-                            {categories.map((category) => (
-                                <option key={category.title} value={category.id}>
-                                    {category.title}
-                        </option>
-                        ))}
-                    </select>
-                    <input   type="text"
-                    placeholder="Search products..."
-                    value={searchQuery}
-                    onChange={handleSearch}
-                    style={{ marginLeft: '10px' }} // Inline style for left-side margin
-
-                    />
-                </div>
-                <div className="product-list">
-                    {products.map((product) => (
-                        <div key={product.id} className="product-item">
-                            <img src={`http://localhost/${product.image_path}`} alt={product.title}/>
-                            <h2>{product.title}</h2>
-                            <p>Price: ${product.price}</p>
-                            <button  onClick={() => addToCart(product)}>Add to Cart</button>
+                <div className="app-container">
+                    <div className="product-page-container">
+                        <h3>Product List</h3>
+                        <div style={{ marginBottom: "5px" }}>
+                            <select
+                                onChange={(e) =>
+                                    getProductsByCategory(e.target.value)
+                                }
+                            >
+                                <option value="">All Categories</option>
+                                {categories.map((category) => (
+                                    <option
+                                        key={category.title}
+                                        value={category.id}
+                                    >
+                                        {category.title}
+                                    </option>
+                                ))}
+                            </select>
+                            <input
+                                type="text"
+                                placeholder="Search products..."
+                                value={searchQuery}
+                                onChange={handleSearch}
+                                style={{ marginLeft: "10px" }} // Inline style for left-side margin
+                            />
                         </div>
-                    ))}
-                </div>
-            </div>
-
-            <div className="cart">
-                <h2>Product Cart</h2>
-                {cart.length === 0 ? (
-                    <p>Your cart is empty</p>
-                ) : (
-                    <>
-                        <ul>
-                            {cart.map((cartItem) => (
-                                <li  className="cart-item">
-                                    <div className="product-details">
-                                        {/* <img src={`http://localhost/${cartItem.image_path}`} /> */}
-                                        <div className="product-info">
-                                            <h3>{cartItem.title}</h3>
-
-                                        </div>
-                                    </div>
-                                    <div className="quantity-controls">
-                                        <button onClick={() => decrementQuantity(cartItem)}>-</button>
-                                        <span>{cartItem.quantity}</span>
-                                        <button onClick={() => incrementQuantity(cartItem)}>+</button>
-                                    </div>
-                                    <p>$ {calculateTotalPrice(cartItem)}</p>
-                                    <button className="remove-button" onClick={() => removeFromCart(cartItem.id)}>Remove
+                        <div className="product-list">
+                            {products.map((product) => (
+                                <div key={product.id} className="product-item">
+                                    <img
+                                        src={`http://localhost/${product.image_path}`}
+                                        alt={product.title}
+                                    />
+                                    <h2>{product.title}</h2>
+                                    <p>Price: ${product.price}</p>
+                                    <button onClick={() => addToCart(product)}>
+                                        Add to Cart
                                     </button>
-                                </li>
+                                </div>
                             ))}
-                        </ul>
-                        <div className="cart-summary">
-                            {/* <p>Subtotal: $ {calculateSubtotal()} </p> */}
-
-                            <p>Subtotal: $ {subtotal} </p>
-
                         </div>
-                    </>
+                    </div>
 
-                )}
-                    {/* <button onClick={(e) => handleSubmit(e)}>Pay Cash</button> */}
-                    <button onClick={(e) => sendCartDataToBackend(e)}>Pay Now</button>
-                    <button onClick={fetchData}>Fetch Data</button>
+                    <div className="cart">
+                        <h2>Product Cart</h2>
 
+                        {cart.length === 0 ? (
+                            <p>Your cart is empty</p>
+                        ) : (
+                            <>
+                                <select
+                                    value={selectedCustomer}
+                                    onChange={(e) =>
+                                        setSelectedCustomer(e.target.value)
+                                    }
+                                >
+                                    <option value="">Select Customer</option>
+                                    {customers.map((customer) => (
+                                        <option
+                                            key={customer.name}
+                                            value={customer.id}
+                                        >
+                                            {customer.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <ul>
+                                    {cart.map((cartItem) => (
+                                        <li className="cart-item">
+                                            <div className="product-details">
+                                                {/* <img src={`http://localhost/${cartItem.image_path}`} /> */}
+                                                <div className="product-info">
+                                                    <h3>{cartItem.title}</h3>
+                                                </div>
+                                            </div>
+                                            <div className="quantity-controls">
+                                                <button
+                                                    onClick={() =>
+                                                        decrementQuantity(
+                                                            cartItem
+                                                        )
+                                                    }
+                                                >
+                                                    -
+                                                </button>
+                                                <span>{cartItem.quantity}</span>
+                                                <button
+                                                    onClick={() =>
+                                                        incrementQuantity(
+                                                            cartItem
+                                                        )
+                                                    }
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+                                            <p>
+                                                ${" "}
+                                                {calculateTotalPrice(cartItem)}
+                                            </p>
+                                            <button
+                                                className="remove-button"
+                                                onClick={() =>
+                                                    removeFromCart(cartItem.id)
+                                                }
+                                            >
+                                                Remove
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <div className="cart-summary">
+                                    {/* <p>Subtotal: $ {calculateSubtotal()} </p> */}
 
-            </div>
-        </div>
+                                    <p>Subtotal: $ {subtotal} </p>
+                                </div>
+                            </>
+                        )}
 
+                        {cart.length === 0 ? (
+                            ""
+                        ) : (
+                            <button onClick={(e) => sendCartDataToBackend(e)}>
+                                Pay Now
+                            </button>
+                        )}
+                    </div>
+                </div>
             </div>
         </AuthLayout>
     );
